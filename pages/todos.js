@@ -5,21 +5,22 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 config.autoAddCss = false;
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import connectToDB from "@/configs/db";
+import TodoModel from "@/models/Todo";
+import UserModel from "@/models/User";
+import { verifyToken } from "@/utils/auth";
+import { set } from "mongoose";
 
-function Todolist() {
+function Todolist({ user, todos }) {
   const [doesInputShown, setDoesInputShown] = useState(false);
   const [title, setTitle] = useState("");
-  const [todos, setTodos] = useState([]);
+  const [allTodos, setAllTodos] = useState([...todos]);
 
-  useEffect(() => {
-    getAllUserTodos();
-  }, []);
-
-  async function getAllUserTodos() {
+  const getTodos = async () => {
     const res = await fetch(`/api/todos`);
-    const data = await res.json();
-    setTodos(data);
-  }
+    const newAllTodos = await res.json();
+    setAllTodos(newAllTodos);
+  };
 
   const addTodo = async (event) => {
     event.preventDefault();
@@ -37,7 +38,7 @@ function Todolist() {
       console.log(result);
       alert("Todo Created Successfully.");
       setTitle("");
-      getAllUserTodos();
+      getTodos();
     }
   };
 
@@ -69,7 +70,9 @@ function Todolist() {
         </div>
         <div className="head">
           <div className="date">
-            <p>{`user.name`}</p>
+            <p>
+              {user.firstname} {user.lastname}
+            </p>
           </div>
           <div
             className="add"
@@ -98,7 +101,7 @@ function Todolist() {
         <div className="pad">
           <div id="todo">
             <ul id="tasksContainer">
-              {todos.map((todo) => (
+              {allTodos.map((todo) => (
                 <li key={todo._id}>
                   <span className="mark">
                     <input type="checkbox" className="checkbox" />
@@ -117,6 +120,38 @@ function Todolist() {
       </div>
     </>
   );
+}
+
+export async function getServerSideProps(context) {
+  connectToDB();
+
+  const { token } = context.req.cookies;
+
+  if (!token) {
+    return { redirect: { destination: "/signin" } };
+  }
+
+  const tokenPayload = verifyToken(token);
+
+  if (!tokenPayload) {
+    return { redirect: { destination: "/signin" } };
+  }
+
+  const user = await UserModel.findOne(
+    {
+      email: tokenPayload.email,
+    },
+    "firstname lastname"
+  );
+
+  const todos = await TodoModel.find({ user: user._id });
+
+  return {
+    props: {
+      user: JSON.parse(JSON.stringify(user)),
+      todos: JSON.parse(JSON.stringify(todos)),
+    },
+  };
 }
 
 export default Todolist;
