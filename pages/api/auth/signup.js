@@ -1,5 +1,5 @@
 import connectToDB from "@/configs/db";
-import UserModel from "@/model/User";
+import UserModel from "@/models/User";
 import { generateToken, hashPassword } from "@/utils/auth";
 import { serialize } from "cookie";
 

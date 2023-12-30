@@ -1,5 +1,5 @@
 import connectToDB from "@/configs/db";
-import UserModel from "@/model/User";
+import UserModel from "@/models/User";
 import { verifyToken } from "@/utils/auth";
 
 const handler = async (req, res) => {
