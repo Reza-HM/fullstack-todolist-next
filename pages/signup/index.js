@@ -30,7 +30,7 @@ function Index() {
       setPassword("");
 
       alert("Registered Successfully :))");
-      router.replace("/dashboard");
+      router.replace("/todos");
     } else if (res.status === 422) {
       alert("This username or email exist already !!");
     }

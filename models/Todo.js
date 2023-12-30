@@ -1,5 +1,4 @@
 const { default: mongoose, mongo } = require("mongoose");
-const { schema: userSchema } = require("./User");
 const UserModel = require("./User");
 
 const schema = mongoose.Schema(
@@ -8,12 +7,12 @@ const schema = mongoose.Schema(
       type: String,
       required: true,
     },
-    completed: {
+    isCompleted: {
       type: Boolean,
       required: true,
     },
     user: {
-      type: userSchema,
+      type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
     },
