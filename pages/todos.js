@@ -9,6 +9,17 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 function Todolist() {
   const [doesInputShown, setDoesInputShown] = useState(false);
   const [title, setTitle] = useState("");
+  const [todos, setTodos] = useState([]);
+
+  useEffect(() => {
+    getAllUserTodos();
+  }, []);
+
+  async function getAllUserTodos() {
+    const res = await fetch(`/api/todos`);
+    const data = await res.json();
+    setTodos(data);
+  }
 
   const addTodo = async (event) => {
     event.preventDefault();
@@ -26,6 +37,7 @@ function Todolist() {
       console.log(result);
       alert("Todo Created Successfully.");
       setTitle("");
+      getAllUserTodos();
     }
   };
 
@@ -86,17 +98,19 @@ function Todolist() {
         <div className="pad">
           <div id="todo">
             <ul id="tasksContainer">
-              <li>
-                <span className="mark">
-                  <input type="checkbox" className="checkbox" />
-                </span>
-                <div className="list">
-                  <p>{`Todo.title`}</p>
-                </div>
-                <span className="delete">
-                  <FontAwesomeIcon icon={faTrash} />
-                </span>
-              </li>
+              {todos.map((todo) => (
+                <li key={todo._id}>
+                  <span className="mark">
+                    <input type="checkbox" className="checkbox" />
+                  </span>
+                  <div className="list">
+                    <p>{todo.title}</p>
+                  </div>
+                  <span className="delete">
+                    <FontAwesomeIcon icon={faTrash} />
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
