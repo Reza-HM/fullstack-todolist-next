@@ -508,3 +508,8 @@ button a {
   display: block;
 }
 /* Other */
+
+.todo-wrapper {
+  background-color: #fff;
+  display: flex;
+}
